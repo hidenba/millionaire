@@ -1,4 +1,5 @@
 require 'pathname'
+require 'tapp'
 
 RSpec.configure do |config|
 end

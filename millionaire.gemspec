@@ -19,6 +19,9 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_development_dependency "rspec"
+  s.add_development_dependency "shoulda-matchers"
+  s.add_development_dependency "tapp"
+
   s.add_dependency "activemodel"
   s.add_dependency "activesupport"
 

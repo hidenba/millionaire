@@ -1,5 +1,7 @@
 require "millionaire/version"
 
 module Millionaire
-  # Your code goes here...
+  require 'csv'
+  require 'active_support/all'
+  require 'active_model'
 end
