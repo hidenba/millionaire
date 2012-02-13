@@ -7,8 +7,9 @@ module Millionaire::Base
   include ActiveModel::Validations
 
   included do
-    class_attribute :csv_data, :columns
+    class_attribute :csv_data, :columns, :indexes
     self.columns = []
+    self.indexes = {}
   end
 
   def initialize(attr={})
@@ -25,7 +26,14 @@ module Millionaire::Base
         when :length; validates name, length: {maximum: v}
         when :value; validates name, inclusion: {in: v}
         when :constraint; validates name, v
+        when :index; self.indexes[name.to_s] = []
         end
+      end
+    end
+
+    def index(*name)
+      name.each do |n|
+        self.indexes[n.is_a?(Array) ? n.map(&:to_s).join('_') : n.to_s]  = []
       end
     end
 
@@ -35,10 +43,14 @@ module Millionaire::Base
       csv.each do |row|
         self.csv_data << self.new(row.to_hash.slice(*self.column_names))
       end
+      self.indexes.keys.each do |k|
+        self.indexes[k] = self.csv_data.group_by{|v| v.send(k) }
+      end
     end
 
     def all; self.csv_data; end
     def columns; self.columns; end
     def column_names; self.columns.map(&:name); end
+    def indexes; self.indexes; end
   end
 end

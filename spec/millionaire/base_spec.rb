@@ -6,7 +6,8 @@ describe Millionaire::Base do
   describe '.column' do
     class CsvLoad
       include Millionaire::Base
-      column :presence, null: false
+      column :index , index: true
+      column :presence, null: false, index: true
       column :length, length: 20
       column :inclution, value: %w(foo bar)
       column :constraint, constraint: {format: {with: /\A[a-zA-Z]+\z/}}
@@ -26,26 +27,49 @@ describe Millionaire::Base do
       its([:constraint]) { should be_kind_of ActiveModel::Validations::FormatValidator }
       its([:int]) { should be_kind_of ActiveModel::Validations::InclusionValidator }
     end
+
+    context 'インデックスが設定できる' do
+      subject { CsvLoad.indexes }
+      its(:keys) { should  =~ ['index', 'presence'] }
+    end
+  end
+
+  describe '.index' do
+    class Index
+      include Millionaire::Base
+      column :index_a
+      column :index_b
+      index :index_a, :index_b
+      index [:index_a, :index_b]
+    end
+
+    subject { Index.indexes }
+    its(:keys) { should  =~ ['index_a', 'index_b', 'index_a_index_b'] }
   end
 
   describe '.all' do
-    class CsvLoad
+    class AllLoad
       include Millionaire::Base
-      column :str
+      column :str, index: true
     end
 
     let(:io) { StringIO.new %w(str foo bar).join("\n") }
 
     before do
-      CsvLoad.load io
+      AllLoad.load io
     end
 
-    subject { CsvLoad.all }
+    subject { AllLoad.all }
     it { should have(2).recoed }
 
     context '設定したカラムに値が入っている' do
-      subject { CsvLoad.all.first }
+      subject { AllLoad.all.first }
       its(:str) { should == 'foo' }
+    end
+
+    context 'インデックスが作成されている' do
+      subject { AllLoad.indexes['str'] }
+      its(['foo']) { should have(1).record }
     end
   end
 end
