@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'millionaire'
 require 'millionaire/column'
+require 'activemodel/validations/csv_uniqness'
 
 module Millionaire::Base
   extend ActiveSupport::Concern
@@ -19,7 +20,7 @@ module Millionaire::Base
   module ClassMethods
     def column(name, option={})
       attr_accessor name
-      self.columns << Millionaire::Column.new(name)
+      self.columns << Millionaire::Column.new(name, option)
       option.each do |k,v|
         case k
         when :null; validates name, presence: true unless v
@@ -27,6 +28,7 @@ module Millionaire::Base
         when :value; validates name, inclusion: {in: v}
         when :constraint; validates name, v
         when :index; self.indexes[name.to_s] = []
+        when :uniq; validates name, csv_uniqness: v
         end
       end
     end
@@ -43,6 +45,8 @@ module Millionaire::Base
       csv.each do |row|
         self.csv_data << self.new(row.to_hash.slice(*self.column_names))
       end
+
+      self.indexes[uniqness] = [] if uniqness.present?
       self.indexes.keys.each do |k|
         self.indexes[k] = self.csv_data.group_by{|v| v.send(k) }
       end
@@ -52,5 +56,9 @@ module Millionaire::Base
     def columns; self.columns; end
     def column_names; self.columns.map(&:name); end
     def indexes; self.indexes; end
+
+    def uniqness
+      self.columns.select(&:uniq).map(&:name).join('_')
+    end
   end
 end

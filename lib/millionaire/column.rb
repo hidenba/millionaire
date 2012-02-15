@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 class Millionaire::Column
-  attr_accessor :name
+  attr_accessor :name, :uniq
 
-  def initialize(name)
+  def initialize(name, option)
     @name = name.to_s
+    @uniq = option[:uniq]
+    @option = option
   end
 end

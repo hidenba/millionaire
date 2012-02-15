@@ -12,6 +12,9 @@ describe Millionaire::Base do
       column :inclution, value: %w(foo bar)
       column :constraint, constraint: {format: {with: /\A[a-zA-Z]+\z/}}
       column :int, integer: true, value: 100..200
+      column :uniq1, uniq: true
+      column :uniq2, uniq: true
+
     end
 
     subject { CsvLoad.new }
@@ -26,11 +29,18 @@ describe Millionaire::Base do
       its([:inclution]) { should be_kind_of ActiveModel::Validations::InclusionValidator }
       its([:constraint]) { should be_kind_of ActiveModel::Validations::FormatValidator }
       its([:int]) { should be_kind_of ActiveModel::Validations::InclusionValidator }
+      its([:uniq1]) { should be_kind_of ActiveModel::Validations::CsvUniqnessValidator }
+      its([:uniq2]) { should be_kind_of ActiveModel::Validations::CsvUniqnessValidator }
     end
 
     context 'インデックスが設定できる' do
       subject { CsvLoad.indexes }
       its(:keys) { should  =~ ['index', 'presence'] }
+    end
+
+    context '一意性やが設定できる' do
+      subject { CsvLoad.uniqness }
+      it { should  == 'uniq1_uniq2'}
     end
   end
 
