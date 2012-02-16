@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 require 'spec_helper'
-require 'millionaire/base'
+require 'millionaire/csv'
 
-describe Millionaire::Base do
+describe Millionaire::Csv do
   describe '.column' do
     class CsvLoad
-      include Millionaire::Base
+      include Millionaire::Csv
       column :index , index: true
       column :presence, null: false, index: true
       column :length, length: 20
@@ -39,7 +39,7 @@ describe Millionaire::Base do
 
   describe '.index' do
     class Index
-      include Millionaire::Base
+      include Millionaire::Csv
       column :index_a
       column :index_b
       index :index_a, :index_b
@@ -52,7 +52,7 @@ describe Millionaire::Base do
 
   describe '.all' do
     class AllLoad
-      include Millionaire::Base
+      include Millionaire::Csv
       column :str, index: true
     end
 
