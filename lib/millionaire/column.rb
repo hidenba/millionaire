@@ -8,4 +8,8 @@ class Millionaire::Column
     @uniq = option[:uniq]
     @option = option
   end
+
+  def uniq_key
+    uniq.is_a?(Array) ? [name, *uniq].join('_') : name
+  end
 end
