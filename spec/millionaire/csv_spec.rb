@@ -83,13 +83,21 @@ describe Millionaire::Csv do
       column :str_a
       column :str_b
       column :str_c
+      index [:str_b, :str_c]
     end
 
     before do
       AllLoad.load StringIO.new %w(str_a,str_b,str_c 1,2,3 2,1,3 3,1,2).join("\n")
     end
 
-    subject { AllLoad.where(str_a: '1', str_b: '2') }
-    it { should have(1).records }
+    context 'インデックスなし' do
+      subject { AllLoad.where(str_a: '1', str_b: '2').first }
+      its(:line_no) { should == 1 }
+    end
+
+    context 'インデックスあり' do
+      subject { AllLoad.where(str_b: '1', str_c: '2').first }
+      its(:line_no) { should == 3 }
+    end
   end
 end

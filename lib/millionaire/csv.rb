@@ -66,10 +66,14 @@ module Millionaire::Csv
     end
 
     def where(query)
-      group = self.csv_data.group_by do |r|
-        query.map{|k,v| r.send(k)}
+      if self.indexes.key? query.keys
+        self.indexes[query.keys][query.values]
+      else
+        group = self.csv_data.group_by do |r|
+          query.map{|k,v| r.send(k)}
+        end
+        group[query.values]
       end
-      group[query.values]
     end
 
     def all; self.csv_data; end
