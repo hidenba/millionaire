@@ -9,6 +9,8 @@ module Millionaire::Csv
 
   included do
     class_attribute :csv_data, :columns, :indexes
+    attr_accessor :line_no
+
     self.columns = []
     self.indexes = {}
   end
@@ -28,35 +30,50 @@ module Millionaire::Csv
         when :length; validates name, length: {maximum: v}
         when :value; validates name, inclusion: {in: v}
         when :constraint; validates name, v
-        when :index; self.indexes[name.to_s] = []
+        when :index; index(name)
         when :uniq;
-          validates name, csv_uniqness: column.uniq_key
-          self.indexes[column.uniq_key] = []
+          validates name, csv_uniqness: column.uniq
+          index(column.uniq)
         end
       end
     end
 
     def index(*name)
       name.each do |n|
-        self.indexes[n.is_a?(Array) ? n.map(&:to_s).join('_') : n.to_s]  = []
+        self.indexes[Array.wrap n]  = []
       end
     end
+
+    def indexing
+      self.indexes.keys.each do |k|
+        index_data= self.csv_data.group_by do |v|
+          k.map{|a| v.send(a) }
+        end
+        self.indexes[k] = index_data
+      end
+    end
+
+    def indexes; self.indexes; end
+
 
     def load(io)
       self.csv_data = []
       csv = ::CSV.new(io, headers: :first_row, return_headers: false)
-      csv.each do |row|
-        self.csv_data << self.new(row.to_hash.slice(*self.column_names))
+      csv.each_with_index do |row,ix|
+        self.csv_data << self.new(row.to_hash.slice(*self.column_names).merge(line_no: ix.succ))
       end
+      indexing
+    end
 
-      self.indexes.keys.each do |k|
-        self.indexes[k] = self.csv_data.group_by{|v| v.send(k) }
+    def where(query)
+      group = self.csv_data.group_by do |r|
+        query.map{|k,v| r.send(k)}
       end
+      group[query.values]
     end
 
     def all; self.csv_data; end
     def columns; self.columns; end
     def column_names; self.columns.map(&:name); end
-    def indexes; self.indexes; end
   end
 end

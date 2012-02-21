@@ -29,15 +29,9 @@ describe Millionaire::Csv do
       its([:int]) { should be_kind_of ActiveModel::Validations::InclusionValidator }
       its([:uniq1]) { should be_kind_of CsvUniqnessValidator }
     end
-
-    context 'インデックスが設定できる' do
-      subject { CsvLoad.indexes }
-      its(:keys) { should  =~ ['index', 'presence', 'uniq1_index'] }
-    end
-
   end
 
-  describe '.index' do
+  describe 'index' do
     class Index
       include Millionaire::Csv
       column :index_a
@@ -47,7 +41,18 @@ describe Millionaire::Csv do
     end
 
     subject { Index.indexes }
-    its(:keys) { should  =~ ['index_a', 'index_b', 'index_a_index_b'] }
+    its(:keys) { should  =~ [[:index_a], [:index_b], [:index_a, :index_b]] }
+
+    describe '.indexing' do
+      before do
+        Index.csv_data=[Index.new(index_a: 10, index_b: 20)]
+        Index.indexing
+      end
+
+      its([[:index_a]]) { should have(1).record }
+      its([[:index_b]]) {  should have(1).record }
+      its([[:index_a, :index_b]]) {  should have(1).record }
+    end
   end
 
   describe '.all' do
@@ -65,14 +70,26 @@ describe Millionaire::Csv do
     subject { AllLoad.all }
     it { should have(2).recoed }
 
-    context '設定したカラムに値が入っている' do
+    context 'CSVを読み込めている' do
       subject { AllLoad.all.first }
+      its(:line_no) { should == 1 }
       its(:str) { should == 'foo' }
     end
+  end
 
-    context 'インデックスが作成されている' do
-      subject { AllLoad.indexes['str'] }
-      its(['foo']) { should have(1).record }
+  describe '.where' do
+    class AllLoad
+      include Millionaire::Csv
+      column :str_a
+      column :str_b
+      column :str_c
     end
+
+    before do
+      AllLoad.load StringIO.new %w(str_a,str_b,str_c 1,2,3 2,1,3 3,1,2).join("\n")
+    end
+
+    subject { AllLoad.where(str_a: '1', str_b: '2') }
+    it { should have(1).records }
   end
 end
