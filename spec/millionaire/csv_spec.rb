@@ -58,35 +58,42 @@ describe Millionaire::Csv do
     end
   end
 
-  describe '.all' do
-    let(:io) { StringIO.new %w(str foo bar).join("\n") }
-
-    before do
-      CsvRecord.load io
-    end
-
-    subject { CsvRecord.all }
-    it { should have(2).recoed }
-
-    context 'load csv' do
-      subject { CsvRecord.all.first }
-      its(:line_no) { should == 1 }
-      its(:str) { should == 'foo' }
-    end
-  end
-
-  describe '.find' do
+  describe 'finder' do
     before do
       CsvRecord.load StringIO.new %w(str alice bob chris).join("\n")
     end
 
-    subject { CsvRecord.find line_no }
-    let(:line_no) { 2 }
-    its(:str) { should == 'bob' }
+    describe '.find' do
+      subject { CsvRecord.find line_no }
+      let(:line_no) { 2 }
 
-    context 'recoed not found' do
-      let(:line_no) { 100 }
-      it { should be_nil }
+      its(:str) { should == 'bob' }
+
+      context 'recoed not found' do
+        let(:line_no) { 100 }
+        it { should be_nil }
+      end
+    end
+
+    describe '.all' do
+      subject { CsvRecord.all }
+      it { should have(3).recoed }
+
+      context 'load csv' do
+        subject { CsvRecord.all.first }
+        its(:line_no) { should == 1 }
+        its(:str) { should == 'alice' }
+      end
+    end
+
+    describe '.first' do
+      subject { CsvRecord.first }
+      its(:str) { should == 'alice' }
+    end
+
+    describe '.last' do
+      subject { CsvRecord.last }
+      its(:str) { should == 'chris' }
     end
   end
 

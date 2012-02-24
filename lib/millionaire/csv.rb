@@ -20,6 +20,15 @@ module Millionaire::Csv
   end
 
   module ClassMethods
+    def load(io)
+      self.csv_data = []
+      csv = ::CSV.new(io, headers: :first_row, return_headers: false)
+      csv.each_with_index do |row,ix|
+        self.csv_data << self.new(row.to_hash.slice(*self.column_names).merge(line_no: ix.succ))
+      end
+      indexing
+    end
+
     def column(name, option={})
       attr_accessor name
       column = Millionaire::Column.new(name, option)
@@ -37,6 +46,8 @@ module Millionaire::Csv
         end
       end
     end
+    def columns; self.columns; end
+    def column_names; self.columns.map(&:name); end
 
     def index(*name)
       name.each do |n|
@@ -52,17 +63,7 @@ module Millionaire::Csv
         self.indexes[k] = index_data
       end
     end
-
     def indexes; self.indexes; end
-
-    def load(io)
-      self.csv_data = []
-      csv = ::CSV.new(io, headers: :first_row, return_headers: false)
-      csv.each_with_index do |row,ix|
-        self.csv_data << self.new(row.to_hash.slice(*self.column_names).merge(line_no: ix.succ))
-      end
-      indexing
-    end
 
     def where(query)
       if self.indexes.key? query.keys
@@ -78,9 +79,8 @@ module Millionaire::Csv
     def find(line_no)
       csv_data[line_no.pred]
     end
-
     def all; self.csv_data; end
-    def columns; self.columns; end
-    def column_names; self.columns.map(&:name); end
+    def first; self.csv_data.first; end
+    def last; self.csv_data.last; end
   end
 end
