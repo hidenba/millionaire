@@ -3,8 +3,13 @@ require 'spec_helper'
 require 'millionaire/csv'
 
 describe Millionaire::Csv do
+  class CsvRecord
+    include Millionaire::Csv
+    column :str, index: true
+  end
+
   describe '.column' do
-    class CsvLoad
+    class Column
       include Millionaire::Csv
       column :index , index: true
       column :presence, null: false, index: true
@@ -15,13 +20,11 @@ describe Millionaire::Csv do
       column :uniq1, uniq: [:index]
     end
 
-    subject { CsvLoad.new }
-    it 'カラムが定義されている' do
-      CsvLoad.column_names.each {|name| should respond_to name }
-    end
+    subject { Column.new }
+    it { Column.column_names.each {|name| should respond_to name } }
 
-    context 'カラムの制約を設定できる' do
-      subject { CsvLoad.validators.index_by {|v| v.attributes.first } }
+    context 'column validation' do
+      subject { Column.validators.index_by {|v| v.attributes.first } }
       its([:presence]) { should be_kind_of ActiveModel::Validations::PresenceValidator }
       its([:length]) { should be_kind_of ActiveModel::Validations::LengthValidator }
       its([:inclution]) { should be_kind_of ActiveModel::Validations::InclusionValidator }
@@ -56,29 +59,39 @@ describe Millionaire::Csv do
   end
 
   describe '.all' do
-    class AllLoad
-      include Millionaire::Csv
-      column :str, index: true
-    end
-
     let(:io) { StringIO.new %w(str foo bar).join("\n") }
 
     before do
-      AllLoad.load io
+      CsvRecord.load io
     end
 
-    subject { AllLoad.all }
+    subject { CsvRecord.all }
     it { should have(2).recoed }
 
-    context 'CSVを読み込めている' do
-      subject { AllLoad.all.first }
+    context 'load csv' do
+      subject { CsvRecord.all.first }
       its(:line_no) { should == 1 }
       its(:str) { should == 'foo' }
     end
   end
 
+  describe '.find' do
+    before do
+      CsvRecord.load StringIO.new %w(str alice bob chris).join("\n")
+    end
+
+    subject { CsvRecord.find line_no }
+    let(:line_no) { 2 }
+    its(:str) { should == 'bob' }
+
+    context 'recoed not found' do
+      let(:line_no) { 100 }
+      it { should be_nil }
+    end
+  end
+
   describe '.where' do
-    class AllLoad
+    class Where
       include Millionaire::Csv
       column :str_a
       column :str_b
@@ -87,16 +100,16 @@ describe Millionaire::Csv do
     end
 
     before do
-      AllLoad.load StringIO.new %w(str_a,str_b,str_c 1,2,3 2,1,3 3,1,2).join("\n")
+      Where.load StringIO.new %w(str_a,str_b,str_c 1,2,3 2,1,3 3,1,2).join("\n")
     end
 
-    context 'インデックスなし' do
-      subject { AllLoad.where(str_a: '1', str_b: '2').first }
+    context 'no index' do
+      subject { Where.where(str_a: '1', str_b: '2').first }
       its(:line_no) { should == 1 }
     end
 
-    context 'インデックスあり' do
-      subject { AllLoad.where(str_b: '1', str_c: '2').first }
+    context 'has index' do
+      subject { Where.where(str_b: '1', str_c: '2').first }
       its(:line_no) { should == 3 }
     end
   end

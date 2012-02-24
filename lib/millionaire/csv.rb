@@ -31,7 +31,7 @@ module Millionaire::Csv
         when :value; validates name, inclusion: {in: v}
         when :constraint; validates name, v
         when :index; index(name)
-        when :uniq;
+        when :uniq
           validates name, csv_uniqness: column.uniq
           index(column.uniq)
         end
@@ -55,7 +55,6 @@ module Millionaire::Csv
 
     def indexes; self.indexes; end
 
-
     def load(io)
       self.csv_data = []
       csv = ::CSV.new(io, headers: :first_row, return_headers: false)
@@ -74,6 +73,10 @@ module Millionaire::Csv
         end
         group[query.values]
       end
+    end
+
+    def find(line_no)
+      csv_data[line_no.pred]
     end
 
     def all; self.csv_data; end
