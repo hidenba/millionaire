@@ -112,5 +112,26 @@ describe Millionaire::Csv do
       subject { Where.where(str_b: '1', str_c: '2').first }
       its(:line_no) { should == 3 }
     end
+
+    describe 'operator' do
+      it 'lte' do
+        pending
+      end
+      it 'gte' do
+        pending
+      end
+      it 'lt' do
+        pending
+      end
+      it 'gt' do
+        pending
+      end
+      it 'eq' do
+        pending
+      end
+      it 'ne' do
+        pending
+      end
+    end
   end
 end
