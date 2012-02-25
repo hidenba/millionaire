@@ -23,6 +23,8 @@ describe Millionaire::Csv do
     subject { Column.new }
     it { Column.column_names.each {|name| should respond_to name } }
 
+    it { Column.should have(7).columns }
+
     context 'column validation' do
       subject { Column.validators.index_by {|v| v.attributes.first } }
       its([:presence]) { should be_kind_of ActiveModel::Validations::PresenceValidator }
@@ -121,23 +123,10 @@ describe Millionaire::Csv do
     end
 
     describe 'operator' do
-      it 'lte' do
-        pending
-      end
-      it 'gte' do
-        pending
-      end
-      it 'lt' do
-        pending
-      end
-      it 'gt' do
-        pending
-      end
-      it 'eq' do
-        pending
-      end
-      it 'ne' do
-        pending
+      describe 'in' do
+        subject { Where.where(str_a: %w(1 3)) }
+        it { should have(2).record }
+        it { subject.map(&:line_no).should == [1,3] }
       end
     end
   end

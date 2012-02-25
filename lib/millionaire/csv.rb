@@ -46,7 +46,6 @@ module Millionaire::Csv
         end
       end
     end
-    def columns; self.columns; end
     def column_names; self.columns.map(&:name); end
 
     def index(*name)
@@ -63,7 +62,6 @@ module Millionaire::Csv
         self.indexes[k] = index_data
       end
     end
-    def indexes; self.indexes; end
 
     def where(query)
       if self.indexes.key? query.keys
@@ -72,7 +70,12 @@ module Millionaire::Csv
         group = self.csv_data.group_by do |r|
           query.map{|k,v| r.send(k)}
         end
-        group[query.values]
+
+        if query.values.all? {|val| val.is_a? Array }
+          query.values.map {|val| val.map {|v| group[Array.wrap(v)] } }.flatten
+        else
+          group[query.values]
+        end
       end
     end
 
