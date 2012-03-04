@@ -35,7 +35,7 @@ end
 .loadメソッドにioオブジェクトを渡すことでCSVをロード
 
 ```
-Sample.load(File.open file_path )
+Sample.load(File.open file_path)
 ```
 
 ## レコードの検索
@@ -126,17 +126,29 @@ column :name, uniq: [:adress]
 ```
 
 ### index
-カラム定義でインデックスを設定できる
 .whereで検索時に作成したインデックスを利用して検索を行うので、通常より高速な検索が可能となる。
 複合インデックスの場合には、配列で定義をすることができるが、検索順序は定義した順でないとインデックスが効かないので
 注意が必要
+
+カラム定義でインデックスを設定
 
 ```
 column :name, index: true
 ```
 
-indexを宣言的に定義できる
+indexを宣言的に定義
 
 ```
 index :name, [:name, :adress]
 ```
+
+## 今後の実装予定
+
+* belongs_to, has_many, has_one 等の関連の定義
+** 一括ロードの仕組み?
+* エンコーディングやセパレータの設定が出来る仕組み
+* CSV出力
+* uniq validator
+* whereの連結
+* whereで検索時に演算子を指定(:lt, glt...)
+* READMEを英語化
