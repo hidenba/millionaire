@@ -86,43 +86,57 @@ samples = Sample.where(address: ['tokyo','kyoto'])
 ### presence validator
 必須項目の検証
 
-'''
+```
 column :name, pressence: true
-'''
+```
 
 ### length validator
 データの長さの検証
 
-'''
+```
 column :name, length: 20
-'''
+```
 
 ### Inclution validator
 配列で定義した内容の検証
 
-'''
+```
 column :name, value: %w(aice bob chrice)
-'''
+```
 
 ### Integer Inclutioon
 数値の場合に配列で定義した内容の検証
 
-'''
+```
 column :name, integer: true, value: 100..200
-'''
+```
 
 ### constraint
 ActiveModel::Validationsで定義されているvaridationを自由に記述できる
 
-'''
+```
 column :name, constraint: {format: {with: /\A[a-zA-Z]+\z/}}
-'''
+```
 
 ### uniq(定義できるけど未実装)
 単一カラムや複数カラムでの一意性を検証
 
-'''
+```
 column :name, uniq: [:adress]
-'''
+```
 
 ### index
+カラム定義でインデックスを設定できる
+.whereで検索時に作成したインデックスを利用して検索を行うので、通常より高速な検索が可能となる。
+複合インデックスの場合には、配列で定義をすることができるが、検索順序は定義した順でないとインデックスが効かないので
+注意が必要
+
+```
+column :name, index: true
+```
+
+indexを宣言的に定義できる
+
+```
+index :name, [:name, :adress]
+```
