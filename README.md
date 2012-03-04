@@ -152,3 +152,4 @@ index :name, [:name, :adress]
 * whereの連結
 * whereで検索時に演算子を指定(:lt, glt...)
 * READMEを英語化
+* ヘッダのないCSV対応
