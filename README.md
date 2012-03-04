@@ -5,16 +5,16 @@ CSVを簡単に扱えるようになります。
 
 現在はヘッダーのあるCSVしか読み込みはできないが、将来的にはヘッダーのないCSVにも対応する予定
 
-## usage
+# usage
 
-### install
+## install
 bundlerを使用している場合はGemfileにmillonaireを追加
 
 ```
 gem 'millionaire'
 ```
 
-### クラス定義
+## クラス定義
 [name,address,phone,email]というフォーマットのCSVの場合
 
 CSVヘッダのカラムと同一名称でカラムを定義することができるようになる
@@ -31,32 +31,35 @@ class Smaple
 end
 ```
 
-### CSVデータの読み込み
+## CSVデータの読み込み
 .loadメソッドにioオブジェクトを渡すことでCSVをロード
 
 ```
 Sample.load(File.open file_path )
 ```
 
-### レコードの検索
-.all すべてのレコードを取得
+## レコードの検索
+
+### .all すべてのレコードを取得
 
 ```
 samples = Sample.all
 samples.class.name   => Array
 ```
 
-.first 最初のレコードを取得
+### .first 最初のレコードを取得
+
 ```
 sample = Sample.first
 ```
 
-.last 最後のレコードを取得
+### .last 最後のレコードを取得
+
 ```
 sample = Sample.last
 ```
 
-.where カラムを対象に検索を行う
+### .where カラムを対象に検索を行う
 
 単一カラムを対象とした検索
 
@@ -76,6 +79,50 @@ samples = Sample.where(address: 'tokyo', name 'arice')
 samples = Sample.where(address: ['tokyo','kyoto'])
 ```
 
-### validation
+## validation
+
+カラム定義で宣言的にvalidationをかけることができる
+
+### presence validator
+必須項目の検証
+
+'''
+column :name, pressence: true
+'''
+
+### length validator
+データの長さの検証
+
+'''
+column :name, length: 20
+'''
+
+### Inclution validator
+配列で定義した内容の検証
+
+'''
+column :name, value: %w(aice bob chrice)
+'''
+
+### Integer Inclutioon
+数値の場合に配列で定義した内容の検証
+
+'''
+column :name, integer: true, value: 100..200
+'''
+
+### constraint
+ActiveModel::Validationsで定義されているvaridationを自由に記述できる
+
+'''
+column :name, constraint: {format: {with: /\A[a-zA-Z]+\z/}}
+'''
+
+### uniq(定義できるけど未実装)
+単一カラムや複数カラムでの一意性を検証
+
+'''
+column :name, uniq: [:adress]
+'''
 
 ### index
