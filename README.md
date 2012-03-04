@@ -9,6 +9,7 @@ CSVを簡単に扱えるようになります。
 
 ### install
 bundlerを使用している場合はGemfileにmillonaireを追加
+
 ```
 gem 'millionaire'
 ```
@@ -17,7 +18,8 @@ gem 'millionaire'
 [name,address,phone,email]というフォーマットのCSVの場合
 
 CSVヘッダのカラムと同一名称でカラムを定義することができるようになる
-```ruby
+
+```
 require 'millionaire'
 class Smaple
   include Millionaire::Csv
@@ -31,37 +33,49 @@ end
 
 ### CSVデータの読み込み
 .loadメソッドにioオブジェクトを渡すことでCSVをロード
-```ruby
+
+```
 Sample.load(File.open file_path )
 ```
 
 ### レコードの検索
 .all すべてのレコードを取得
-```ruby
+
+```
 samples = Sample.all
 samples.class.name   => Array
 ```
+
 .first 最初のレコードを取得
-```ruby
+```
 sample = Sample.first
 ```
+
 .last 最後のレコードを取得
-```ruby
+```
 sample = Sample.last
 ```
+
 .where カラムを対象に検索を行う
 
 単一カラムを対象とした検索
-```ruby
+
+```
 samples = Sample.where(address: 'tokyo')
 ```
 
 複数カラムを対象とした検索
-```ruby
+
+```
 samples = Sample.where(address: 'tokyo', name 'arice')
 ```
 
 単一カラムで複数の値で検索
-```ruby
+
+```
 samples = Sample.where(address: ['tokyo','kyoto'])
 ```
+
+### validation
+
+### index
