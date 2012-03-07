@@ -1,4 +1,4 @@
-## instlation
+## installrtion
 
 ```
 gem 'millionaire'
