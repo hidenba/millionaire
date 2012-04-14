@@ -41,8 +41,8 @@ module Millionaire::Csv
         when :constraint; validates name, v
         when :index; index(name)
         when :uniq
-          validates name, csv_uniqness: column.uniq
-          index(column.uniq)
+          validates name, csv_uniqness: v
+          index(name)
         end
       end
     end

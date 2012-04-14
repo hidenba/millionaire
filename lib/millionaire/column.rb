@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+require 'millionaire'
 
 class Millionaire::Column
   attr_accessor :name, :uniq
